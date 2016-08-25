@@ -58,19 +58,17 @@ public class EditProviderActivity extends AppCompatActivity {
         try
         {
             String name = txtName.getText().toString();
-            if (Utils.isNullOrEmpty(name))
-                throw new Exception("Name cannot be empty");
 
             Double fare, balance;
 
             String tmp;
             tmp = txtFare.getText().toString();
             fare = Double.parseDouble(tmp);
-            validateAmount(fare, null);
 
             tmp = txtBalance.getText().toString();
             balance = Double.parseDouble(tmp);
-            validateAmount(balance, null);
+
+            //TODO: Add unit
 
             Provider provider;
             if (existing()) {
@@ -79,10 +77,12 @@ public class EditProviderActivity extends AppCompatActivity {
                 provider.setBalance(balance);
                 provider.setFare(fare);
 
+                Provider.validateProvider(provider);
                 ds.updateProvider(provider);
             }
             else {
                 provider = new Provider(name, balance, fare);
+                Provider.validateProvider(provider);
 
                 Long id = ds.insertProvider(provider);
                 provider.setId(id);
@@ -97,10 +97,6 @@ public class EditProviderActivity extends AppCompatActivity {
         }
     }
 
-    private void validateAmount(Double amount, Object valueType) throws Exception {
-        if (amount < 0)
-            throw new Exception("The amount cannot be negative");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

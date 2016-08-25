@@ -1,5 +1,7 @@
 package com.innouvous.balancetracker.data;
 
+import com.innouvous.utils.Utils;
+
 import java.util.Date;
 
 /**
@@ -13,6 +15,18 @@ public class Provider {
     private double balance;
     private double fare;
     private String unit;
+
+    public static void validateProvider(Provider provider) throws Exception {
+        validateAmount(provider.getBalance(), null);
+        validateAmount(provider.getFare(), null);
+        if (Utils.isNullOrEmpty(provider.getName()))
+            throw new Exception("Name cannot be empty");
+    }
+
+    private static void validateAmount(Double amount, Object valueType) throws Exception {
+        if (amount < 0)
+            throw new Exception("The amount cannot be negative");
+    }
 
     public Provider(String name, double balance, double fare)
     {

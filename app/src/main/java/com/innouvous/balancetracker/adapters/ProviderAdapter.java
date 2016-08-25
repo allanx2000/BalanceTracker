@@ -12,10 +12,10 @@ import com.innouvous.balancetracker.AppStateService;
 import com.innouvous.balancetracker.R;
 import com.innouvous.balancetracker.data.Provider;
 
-import java.sql.Date;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Currency;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 

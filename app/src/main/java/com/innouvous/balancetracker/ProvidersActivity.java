@@ -16,6 +16,7 @@ import com.innouvous.balancetracker.adapters.ProviderAdapter;
 import com.innouvous.balancetracker.data.IDataStore;
 import com.innouvous.balancetracker.data.MockDataStore;
 import com.innouvous.balancetracker.data.Provider;
+import com.innouvous.balancetracker.data.SQLiteDataStore;
 import com.innouvous.utils.ToastHelper;
 
 import java.util.List;
@@ -42,7 +43,8 @@ public class ProvidersActivity extends AppCompatActivity {
         AppStateService.setAppContext(this.getApplicationContext());
         ToastHelper.initializeHelper(this);
 
-        ds = new MockDataStore();
+        ds = new SQLiteDataStore(this.getApplicationContext());
+        //ds = new MockDataStore();
         AppStateService.setDataStore(ds);
 
         setContentView(R.layout.activity_main);

@@ -9,6 +9,7 @@ import com.innouvous.balancetracker.data.sql.DataHelper;
 import com.innouvous.balancetracker.data.sql.DataUtils;
 import com.innouvous.balancetracker.data.sql.SQLConst;
 import com.innouvous.utils.SQLiteBuilder;
+import com.innouvous.utils.SQLiteUtils;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class SQLiteDataStore  implements IDataStore {
 
         try {
 
-            validateProvider(provider);
+            Provider.validateProvider(provider);
 
             values.put(SQLConst.Providers.NAME, provider.getName());
             values.put(SQLConst.Providers.BALANCE, provider.getBalance());
@@ -51,21 +52,25 @@ public class SQLiteDataStore  implements IDataStore {
         }
     }
 
-    private void validateProvider(Provider provider) {
-        //TODO: Add logic, make static? move to Provider class
-    }
-
     @Override
     public void updateProvider(Provider provider) throws Exception {
         ContentValues values = new ContentValues();
 
         try {
-            validateProvider(provider);
+            Provider.validateProvider(provider);
 
             values.put(SQLConst.Providers.NAME, provider.getName());
             values.put(SQLConst.Providers.BALANCE, provider.getBalance());
             values.put(SQLConst.Providers.FARE, provider.getFare());
             values.put(SQLConst.Providers.UNIT, "DUMMY"); //TODO: Change
+
+            if (provider.getLastUsed() == null)
+                values.putNull(SQLConst.Providers.LAST_USED);
+            else
+            {
+                String strLastUsed = SQLiteUtils.fromDate(provider.getLastUsed());
+                values.put(SQLConst.Providers.LAST_USED, strLastUsed);
+            }
 
             SQLiteBuilder sb = new SQLiteBuilder(SQLConst.Providers.TABLE);
             sb.update(db, SQLConst.Providers.ID, provider.getId(), values);
