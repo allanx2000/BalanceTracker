@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:screenOrientation="portrait"
             android:name=".ProvidersActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
@@ -18,7 +19,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditProviderActivity"></activity>
+
+        <activity
+            android:name=".EditProviderActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

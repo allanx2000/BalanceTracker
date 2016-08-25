@@ -31,6 +31,12 @@ public class MockDataStore implements IDataStore {
 
     @Override
     public Long insertProvider(Provider provider) throws Exception {
+
+        if (providerExists(provider.getName(), null))
+        {
+            throwProviderExists();
+        }
+
         Long id = nextId++;
         provider.setId(id);
 
@@ -40,7 +46,16 @@ public class MockDataStore implements IDataStore {
 
     @Override
     public void updateProvider(Provider provider) throws Exception {
+        if (providerExists(provider.getName(), provider.getId()))
+        {
+            throwProviderExists();
+        }
+
         providers.put(provider.getId(), provider);
+    }
+
+    private void throwProviderExists() throws Exception {
+        throw new Exception("A provider with the same name already exists.");
     }
 
     @Override
@@ -59,10 +74,10 @@ public class MockDataStore implements IDataStore {
     }
 
     @Override
-    public boolean providerExists(String name) throws Exception {
+    public boolean providerExists(String name, Long id) throws Exception {
         for (Provider p : providers.values())
         {
-            if (p.getName().equals(name))
+            if (p.getName().equals(name) && p.getId() != id)
                 return true;
         }
 

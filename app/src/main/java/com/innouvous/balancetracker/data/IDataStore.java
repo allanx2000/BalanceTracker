@@ -13,5 +13,5 @@ public interface IDataStore {
     List<Provider> getProviders() throws Exception;
     Provider getProvider(Long id) throws Exception;
 
-    boolean providerExists(String name) throws Exception;
+    boolean providerExists(String name, Long id) throws Exception;
 }

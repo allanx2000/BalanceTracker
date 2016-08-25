@@ -1,6 +1,6 @@
 package com.innouvous.balancetracker.data;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * Created by Allan on 8/21/2016.
@@ -12,6 +12,7 @@ public class Provider {
     private Date lastUsed = null;
     private double balance;
     private double fare;
+    private String unit;
 
     public Provider(String name, double balance, double fare)
     {
@@ -58,5 +59,13 @@ public class Provider {
 
     public void setFare(double fare) {
         this.fare = fare;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getUnit() {
+        return unit;
     }
 }

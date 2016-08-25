@@ -9,12 +9,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.innouvous.balancetracker.adapters.ProviderAdapter;
 import com.innouvous.balancetracker.data.IDataStore;
 import com.innouvous.balancetracker.data.MockDataStore;
 import com.innouvous.balancetracker.data.Provider;
+import com.innouvous.utils.ToastHelper;
 
 import java.util.List;
 
@@ -29,14 +31,18 @@ public class ProvidersActivity extends AppCompatActivity {
     private ListView providersList;
 
     private final Context context = this;
+    private List<Provider> providers;
+    private Provider selectedProvider;
+    private IDataStore ds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         AppStateService.setAppContext(this.getApplicationContext());
+        ToastHelper.initializeHelper(this);
 
-        IDataStore ds = new MockDataStore();
+        ds = new MockDataStore();
         AppStateService.setDataStore(ds);
 
         setContentView(R.layout.activity_main);
@@ -54,19 +60,28 @@ public class ProvidersActivity extends AppCompatActivity {
         });
 
         providersList = (ListView) findViewById(R.id.listProviders);
+        registerForContextMenu(providersList);
+        providersList.setOnCreateContextMenuListener(this);
+        providersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedProvider = providers.get(position);
+                openContextMenu(providersList);
+            }
+        });
 
-        try {
-            loadProviders(ds);
-
-        } catch (Exception e) {
-            //TODO: Toast
-        }
+        loadProviders();
     }
 
-    private void loadProviders(IDataStore ds) throws Exception {
-        List<Provider> providers = ds.getProviders();
-        ProviderAdapter adapter = new ProviderAdapter(this, R.layout.item_provider, providers, getResources().getConfiguration().locale);
-        providersList.setAdapter(adapter);
+    private void loadProviders()  {
+        try {
+            providers = ds.getProviders();
+            ProviderAdapter adapter = new ProviderAdapter(this, R.layout.item_provider, providers, getResources().getConfiguration().locale);
+            providersList.setAdapter(adapter);
+
+        } catch (Exception e) {
+            ToastHelper.showShortToast("Error: " + e.getMessage());
+        }
     }
 
     @Override
@@ -74,6 +89,14 @@ public class ProvidersActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode == RESULT_OK) {
+            loadProviders();
+        }
     }
 
     @Override
