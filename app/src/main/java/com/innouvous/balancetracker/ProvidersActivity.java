@@ -1,11 +1,13 @@
 package com.innouvous.balancetracker;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +23,7 @@ import com.innouvous.utils.ToastHelper;
 
 import java.util.List;
 
-public class ProvidersActivity extends AppCompatActivity {
+public class ProvidersActivity extends AppCompatActivity implements ProviderAdapter.Callback {
 
     private static final int REQUEST_NEW_PROVIDER = 110;
     private static final int REQUEST_EDIT_PROVIDER = 120;
@@ -78,7 +80,10 @@ public class ProvidersActivity extends AppCompatActivity {
     private void loadProviders()  {
         try {
             providers = ds.getProviders();
-            ProviderAdapter adapter = new ProviderAdapter(this, R.layout.item_provider, providers, getResources().getConfiguration().locale);
+            ProviderAdapter adapter = new ProviderAdapter(this, R.layout.item_provider,
+                    providers, getResources().getConfiguration().locale,
+                    this);
+
             providersList.setAdapter(adapter);
 
         } catch (Exception e) {
@@ -92,6 +97,55 @@ public class ProvidersActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.listProviders)
+        {
+            menu.add(0, v.getId(), 1, "Edit");
+            menu.add(0, v.getId(), 2, "Delete");
+        }
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+
+        if (selectedProvider == null)
+            return true;
+        try {
+            switch (item.getOrder()) {
+                case 1: //Show Locations
+                    Intent intent = EditProviderActivity.createIntent(this, selectedProvider.getId());
+                    startActivityForResult(intent, REQUEST_EDIT_PROVIDER);
+                    break;
+                case 2: //Delete
+                    final Long providerId = selectedProvider.getId();
+                    AppStateService.getAlertBuilder().createDefaultConfirm("Confirm Delete",
+                            "Are you sure you want to delete the selected provider?",
+                            this, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    try {
+                                        AppStateService.getDataStore().deleteProvider(providerId);
+                                        loadProviders();
+                                    } catch (Exception e) {}
+                                }
+                            }).show();
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+        }
+        finally {
+            selectedProvider = null;
+        }
+
+        return true;
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -114,5 +168,21 @@ public class ProvidersActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void useClicked(Provider provider) {
+        try
+        {
+            provider.use();
+            ds.updateProvider(provider);
+            ToastHelper.showShortToast("Recorded. Left: " + provider.getBalance());
+
+            loadProviders();
+        }
+        catch (Exception e)
+        {
+            ToastHelper.showShortToast(e.getMessage());
+        }
     }
 }

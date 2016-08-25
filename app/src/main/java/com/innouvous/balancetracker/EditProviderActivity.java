@@ -9,20 +9,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.innouvous.balancetracker.data.IDataStore;
 import com.innouvous.balancetracker.data.Provider;
 import com.innouvous.utils.ToastHelper;
-import com.innouvous.utils.Utils;
+
+import java.text.DecimalFormat;
 
 public class EditProviderActivity extends AppCompatActivity {
 
     private static final String PROVIDER_ID = "ProviderId";
     private ActionBar toolbar;
 
-    private final int NA_INT = -1;
-    private Integer providerId;
+    private final long NA_LONG = -1L;
+    private Long providerId;
 
     private EditText txtName;
     private EditText txtBalance;
@@ -108,13 +108,32 @@ public class EditProviderActivity extends AppCompatActivity {
 
         Intent bundle = getIntent();
 
-        providerId = bundle.getIntExtra(PROVIDER_ID, NA_INT);
-        if (providerId == NA_INT)
+        providerId = bundle.getLongExtra(PROVIDER_ID, NA_LONG);
+        if (providerId == NA_LONG)
             providerId = null;
 
         toolbar.setTitle((existing()? "Edit" : "Add") + " Provider");
 
         wireControls();
+
+        if (providerId != null)
+        {
+            try {
+                existingProvider = ds.getProvider(providerId);
+                txtName.setText(existingProvider.getName());
+                txtBalance.setText(format(existingProvider.getBalance()));
+                txtFare.setText(format(existingProvider.getFare()));
+            } catch (Exception e) {
+                finish();
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static DecimalFormat df2 = new DecimalFormat("0.00");
+
+    private String format(double amount) {
+        return df2.format(amount);
     }
 
     private void wireControls() {

@@ -7,12 +7,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.innouvous.balancetracker.data.IDataStore;
+import com.innouvous.utils.Alerts;
 
 public class AppStateService {
 
     private static IDataStore ds;
     private static Context appContext;
-    //private static Alerts alert;
+    private static Alerts alert;
     private static boolean initialized = false;
 
     public static IDataStore getDataStore() {
@@ -55,7 +56,6 @@ public class AppStateService {
         }
     }
 
-    /*
     public static Alerts getAlertBuilder() {
         if (alert == null) {
             alert = new Alerts(R.style.myDialog);
@@ -63,7 +63,6 @@ public class AppStateService {
 
         return alert;
     }
-    */
 
     /*
     public static DBLogger getDBLogger() {

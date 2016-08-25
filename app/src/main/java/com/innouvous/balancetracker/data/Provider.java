@@ -67,6 +67,14 @@ public class Provider {
         this.balance = balance;
     }
 
+    public void use() throws Exception {
+        if (balance - fare < 0)
+            throw new Exception("The balance is not enough.");
+
+        balance-=fare;
+        lastUsed = Utils.now();
+    }
+
     public double getFare() {
         return fare;
     }
