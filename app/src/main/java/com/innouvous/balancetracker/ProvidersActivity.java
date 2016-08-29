@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
@@ -94,7 +95,7 @@ public class ProvidersActivity extends AppCompatActivity implements ProviderAdap
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -172,17 +173,24 @@ public class ProvidersActivity extends AppCompatActivity implements ProviderAdap
 
     @Override
     public void useClicked(Provider provider) {
-        try
-        {
-            provider.use();
-            ds.updateProvider(provider);
-            ToastHelper.showShortToast("Recorded. Left: " + provider.getBalance());
 
-            loadProviders();
-        }
-        catch (Exception e)
-        {
-            ToastHelper.showShortToast(e.getMessage());
-        }
+        final Provider p = provider;
+
+        AppStateService.getAlertBuilder().createDefaultConfirm("Use Provider", "Use the provider?", this, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        p.use();
+                        ds.updateProvider(p);
+                        ToastHelper.showShortToast("Recorded. Left: " + p.getBalance());
+
+                        loadProviders();
+                    }
+                    catch (Exception e)
+                    {
+                        ToastHelper.showShortToast("Error: " + e.getMessage());
+                    }
+                }
+            }).show();
     }
 }
